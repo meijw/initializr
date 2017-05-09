@@ -1034,11 +1034,11 @@ initializr:
           version: 5.21.0
         - name: Apache Camel
           id: camel
-          versionRange: "[1.4.0.RELEASE,2.0.0.M1)"
+          versionRange: "[1.2.0.RELEASE,2.0.0.M1)"
           description: Integration using Apache Camel
           groupId: org.apache.camel
           artifactId: camel-spring-boot-starter
-          version: 2.19.0
+          version: 2.18.3
         - name: JMS (ActiveMQ)
           id: activemq
           description: Java Message Service API via Apache ActiveMQ
@@ -1124,6 +1124,15 @@ initializr:
           id: remote-shell
           description: CRaSH shell integration
           versionRange: "[1.0.0.RELEASE,1.5.0.RC1)"
+    - name: Speed4J
+      content:
+        - name: Speed4J-Logging
+          id: Speed4J-Logging
+          description: Speed4J
+          version: 1.8.0.RELEASE
+          versionRange: "[1.2.0.RELEASE,1.8.0.RELEASE)"
+          groupId: com.spdb.speed4j
+          artifactId: Speed4J-Logging
   types:
     - name: Maven Project
       id: maven-project

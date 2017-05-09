@@ -52,13 +52,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.resource.ResourceUrlProvider;
 
 /**
- * {@link org.springframework.boot.autoconfigure.EnableAutoConfiguration
- * Auto-configuration} to configure Spring initializr. In a web environment,
- * configures the necessary controller to serve the applications from the
- * root context.
+ * {@link org.springframework.boot.autoconfigure.EnableAutoConfiguration Auto-configuration} to configure Spring initializr. In a web environment, configures the necessary controller to serve the
+ * applications from the root context.
  *
- * <p>Project generation can be customized by defining a custom
- * {@link ProjectGenerator}.
+ * <p>
+ * Project generation can be customized by defining a custom {@link ProjectGenerator}.
  *
  * @author Stephane Nicoll
  */
@@ -67,101 +65,88 @@ import org.springframework.web.servlet.resource.ResourceUrlProvider;
 @AutoConfigureAfter(CacheAutoConfiguration.class)
 public class InitializrAutoConfiguration {
 
-	private final List<ProjectRequestPostProcessor> postProcessors;
+    private final List<ProjectRequestPostProcessor> postProcessors;
 
-	public InitializrAutoConfiguration(
-			ObjectProvider<List<ProjectRequestPostProcessor>> postProcessors) {
-		List<ProjectRequestPostProcessor> list = postProcessors.getIfAvailable();
-		this.postProcessors = list != null ? list : new ArrayList<>();
-	}
+    public InitializrAutoConfiguration(ObjectProvider<List<ProjectRequestPostProcessor>> postProcessors) {
+        List<ProjectRequestPostProcessor> list = postProcessors.getIfAvailable();
+        this.postProcessors = list != null ? list : new ArrayList<>();
+    }
 
-	@Bean
-	public WebConfig webConfig() {
-		return new WebConfig();
-	}
+    @Bean
+    public WebConfig webConfig() {
+        return new WebConfig();
+    }
 
-	@Bean
-	@ConditionalOnMissingBean
-	public MainController initializrMainController(
-			InitializrMetadataProvider metadataProvider,
-			TemplateRenderer templateRenderer,
-			ResourceUrlProvider resourceUrlProvider,
-			ProjectGenerator projectGenerator,
-			DependencyMetadataProvider dependencyMetadataProvider) {
-		return new MainController(metadataProvider, templateRenderer, resourceUrlProvider
-				, projectGenerator, dependencyMetadataProvider);
-	}
+    @Bean
+    @ConditionalOnMissingBean
+    public MainController initializrMainController(InitializrMetadataProvider metadataProvider, TemplateRenderer templateRenderer, ResourceUrlProvider resourceUrlProvider,
+            ProjectGenerator projectGenerator, DependencyMetadataProvider dependencyMetadataProvider) {
+        return new MainController(metadataProvider, templateRenderer, resourceUrlProvider, projectGenerator, dependencyMetadataProvider);
+    }
 
-	@Bean
-	@ConditionalOnMissingBean
-	public UiController initializrUiController(
-			InitializrMetadataProvider metadataProvider) {
-		return new UiController(metadataProvider);
-	}
+    @Bean
+    @ConditionalOnMissingBean
+    public UiController initializrUiController(InitializrMetadataProvider metadataProvider) {
+        return new UiController(metadataProvider);
+    }
 
-	@Bean
-	@ConditionalOnMissingBean
-	public ProjectGenerator projectGenerator() {
-		return new ProjectGenerator();
-	}
+    @Bean
+    @ConditionalOnMissingBean
+    public ProjectGenerator projectGenerator() {
+        return new ProjectGenerator();
+    }
 
-	@Bean
-	@ConditionalOnMissingBean
-	public TemplateRenderer templateRenderer(Environment environment) {
-		RelaxedPropertyResolver resolver = new RelaxedPropertyResolver(environment,
-				"spring.mustache.");
-		boolean cache = resolver.getProperty("cache", Boolean.class, true);
-		TemplateRenderer templateRenderer = new TemplateRenderer();
-		templateRenderer.setCache(cache);
-		return templateRenderer;
-	}
+    @Bean
+    @ConditionalOnMissingBean
+    public TemplateRenderer templateRenderer(Environment environment) {
+        RelaxedPropertyResolver resolver = new RelaxedPropertyResolver(environment, "spring.mustache.");
+        boolean cache = resolver.getProperty("cache", Boolean.class, true);
+        TemplateRenderer templateRenderer = new TemplateRenderer();
+        templateRenderer.setCache(cache);
+        return templateRenderer;
+    }
 
-	@Bean
-	@ConditionalOnMissingBean
-	public ProjectRequestResolver projectRequestResolver() {
-		return new ProjectRequestResolver(postProcessors);
-	}
+    @Bean
+    @ConditionalOnMissingBean
+    public ProjectRequestResolver projectRequestResolver() {
+        return new ProjectRequestResolver(postProcessors);
+    }
 
-	@Bean
-	public ProjectResourceLocator projectResourceLocator() {
-		return new ProjectResourceLocator();
-	}
+    @Bean
+    public ProjectResourceLocator projectResourceLocator() {
+        return new ProjectResourceLocator();
+    }
 
-	@Bean
-	@ConditionalOnMissingBean(InitializrMetadataProvider.class)
-	public InitializrMetadataProvider initializrMetadataProvider(
-			InitializrProperties properties) {
-		InitializrMetadata metadata = InitializrMetadataBuilder
-				.fromInitializrProperties(properties).build();
-		return new DefaultInitializrMetadataProvider(metadata, new RestTemplate());
-	}
+    @Bean
+    @ConditionalOnMissingBean(InitializrMetadataProvider.class)
+    public InitializrMetadataProvider initializrMetadataProvider(InitializrProperties properties) {
+        InitializrMetadata metadata = InitializrMetadataBuilder.fromInitializrProperties(properties).build();
+        return new DefaultInitializrMetadataProvider(metadata, new RestTemplate());
+    }
 
-	@Bean
-	@ConditionalOnMissingBean
-	public DependencyMetadataProvider dependencyMetadataProvider() {
-		return new DefaultDependencyMetadataProvider();
-	}
+    @Bean
+    @ConditionalOnMissingBean
+    public DependencyMetadataProvider dependencyMetadataProvider() {
+        return new DefaultDependencyMetadataProvider();
+    }
 
-	@Configuration
-	@ConditionalOnClass(javax.cache.CacheManager.class)
-	static class CacheConfiguration {
+    @Configuration
+    @ConditionalOnClass(javax.cache.CacheManager.class)
+    static class CacheConfiguration {
 
-		@Bean
-		public JCacheManagerCustomizer initializrCacheManagerCustomizer() {
-			return cm -> {
-				cm.createCache("initializr", config().setExpiryPolicyFactory(
-						CreatedExpiryPolicy.factoryOf(Duration.TEN_MINUTES)));
-				cm.createCache("dependency-metadata", config());
-				cm.createCache("project-resources", config());
-			};
-		}
+        @Bean
+        public JCacheManagerCustomizer initializrCacheManagerCustomizer() {
+            return cm -> {
+                cm.createCache("initializr", config().setExpiryPolicyFactory(CreatedExpiryPolicy.factoryOf(Duration.TEN_MINUTES)));
+                cm.createCache("dependency-metadata", config());
+                cm.createCache("project-resources", config());
+            };
+        }
 
-		private MutableConfiguration<Object, Object> config() {
-			return new MutableConfiguration<>()
-					.setStoreByValue(false)
-					.setManagementEnabled(true).setStatisticsEnabled(true);
-		}
+        private MutableConfiguration<Object, Object> config() {
+            return new MutableConfiguration<>().setStoreByValue(false).setManagementEnabled(true).setStatisticsEnabled(true);
+        }
 
-	}
+    }
 
 }
